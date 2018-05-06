@@ -1,0 +1,2 @@
+# mayqb
+SQL building blocks
