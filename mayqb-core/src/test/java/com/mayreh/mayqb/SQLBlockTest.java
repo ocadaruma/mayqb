@@ -1,5 +1,6 @@
 package com.mayreh.mayqb;
 
+import com.mayreh.mayqb.Parameters.*;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class SQLBlockTest {
     @Test
     public void placeholders() {
         SQLBlock block = SQLBlock.of("${@} + ${@}", 1, 1);
-        assertThat(block).isEqualTo(new SQLBlock("? + ?", Arrays.asList(1, 1)));
+        assertThat(block).isEqualTo(new SQLBlock("? + ?", Arrays.asList(IntParameter.of(1), IntParameter.of(1))));
     }
 
     @Test
@@ -30,6 +31,6 @@ public class SQLBlockTest {
     @Test
     public void mixed() {
         SQLBlock block = SQLBlock.of("SELECT ${@} FROM foo WHERE id = ${@}", SQLBlock.of("name"), 1);
-        assertThat(block).isEqualTo(new SQLBlock("SELECT name FROM foo WHERE id = ?", Collections.singletonList(1)));
+        assertThat(block).isEqualTo(new SQLBlock("SELECT name FROM foo WHERE id = ?", Collections.singletonList(IntParameter.of(1))));
     }
 }

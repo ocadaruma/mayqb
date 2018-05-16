@@ -1,2 +1,4 @@
 # mayqb
-SQL building blocks
+
+A small SQL toolkit
+
