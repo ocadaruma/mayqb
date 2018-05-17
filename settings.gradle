@@ -1,3 +1,4 @@
 rootProject.name = 'mayqb'
 
 include 'mayqb-core'
+include 'mayqb-example'
