@@ -5,6 +5,9 @@ import lombok.Value;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * Provides standard parameter types
+ */
 public class Parameters {
 
     @Value(staticConstructor = "of")

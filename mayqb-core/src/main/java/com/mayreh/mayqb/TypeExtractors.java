@@ -1,7 +1,11 @@
 package com.mayreh.mayqb;
 
+import com.mayreh.mayqb.util.Option;
+import com.mayreh.mayqb.util.ThrowableSupplier;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 /**
  * Provides extractors for standard types
@@ -28,6 +32,30 @@ public class TypeExtractors {
             @Override
             public T get(ResultSet rs, String columnLabel) throws SQLException {
                 return byColumnLabel.get(rs, columnLabel);
+            }
+        };
+    }
+
+    public static <T> TypeExtractor<Option<T>> option(TypeExtractor<T> extractor) {
+        return new TypeExtractor<Option<T>>() {
+            @Override
+            public Option<T> get(ResultSet rs, int idx) throws SQLException {
+                return wrapNull(() -> extractor.get(rs, idx));
+            }
+
+            @Override
+            public Option<T> get(ResultSet rs, String columnLabel) throws SQLException {
+                return wrapNull(() -> extractor.get(rs, columnLabel));
+            }
+
+            private Option<T> wrapNull(ThrowableSupplier<T> a) throws SQLException {
+                Option<T> result;
+                try {
+                    result = Option.apply(a.get());
+                } catch (NullPointerException e) {
+                    result = Option.none();
+                }
+                return result;
             }
         };
     }
