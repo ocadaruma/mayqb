@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Provides standard parameter types
+ * This class contains various parameter classes for standard types
  */
 public class Parameters {
 

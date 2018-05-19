@@ -11,10 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mayreh.mayqb.QueryDSL.selectFrom;
+import static com.mayreh.mayqb.QueryDSL.withSQL;
+
 @RequiredArgsConstructor
 public class UserRepository implements TableRef<User> {
 
-    private final AliasProvider u = aliasProvider("u");
+    public final AliasProvider u = aliasProvider("u");
 
     private final PostRepository postRepository;
 
@@ -33,10 +36,9 @@ public class UserRepository implements TableRef<User> {
                 .build();
     }
 
-    public List<User> findAll(DBContext ctx) {
+    public List<UserWithPosts> findAll(DBContext ctx) {
         selectFrom(this.as(u))
-                .orderBy(u.column(""))
-                .build()
+                .orderBy(u.column("id"))
                 .one(UserRepository::from)
                 .toMany(postRepository::optionalFrom)
                 .map(UserWithPosts::new)
@@ -45,13 +47,28 @@ public class UserRepository implements TableRef<User> {
     }
 
     public List<User> findByName(String name, int limit, DBContext ctx) {
+        withSQL(
+                selectFrom(this.as(u))
+                        .innerJoin(postRepository.as(postRepository.p))
+                        .where(u.column("name").eq(StringParameter.of(name)))
+                        .orderBy(u.column("name").asc())
+        )
+                .one(UserRepository::from)
+                .toMany(postRepository::optionalFrom)
+                .map(UserWithPosts::new)
+                .list()
+                .executeSync(ctx);
+
         selectFrom(this.as(u))
                 .where(u.column("name").eq(StringParameter.of(name)))
                 .orderBy(u.column("name").asc())
-                .limit(limit)
-                .build()
                 .map()
                 .list()
+                .executeSync(ctx);
+
+        Optional<User> user = withSQL(selectFrom(this.as(u)))
+                .transform(this::from)
+                .single()
                 .executeSync(ctx);
     }
 

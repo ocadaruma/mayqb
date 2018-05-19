@@ -1,11 +1,17 @@
 package com.mayreh.mayqb;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-@RequiredArgsConstructor
+@Value
 public class AliasedTableRef<T> {
 
-    private final AliasProvider aliasProvider;
+    AliasProvider aliasProvider;
 
-    private final TableRef<T> tableRef;
+    TableRef<T> tableRef;
+
+    public SQLBlock toSQL() {
+        return SQLBlock.of("${@} AS ${@}",
+                tableRef.toSQL(),
+                aliasProvider.alias());
+    }
 }

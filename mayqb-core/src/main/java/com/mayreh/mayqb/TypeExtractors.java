@@ -5,10 +5,9 @@ import com.mayreh.mayqb.util.ThrowableSupplier;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 /**
- * Provides extractors for standard types
+ * This class contains various extractors for standard types
  */
 public class TypeExtractors {
 
@@ -51,7 +50,7 @@ public class TypeExtractors {
             private Option<T> wrapNull(ThrowableSupplier<T> a) throws SQLException {
                 Option<T> result;
                 try {
-                    result = Option.apply(a.get());
+                    result = Option.ofNullable(a.get());
                 } catch (NullPointerException e) {
                     result = Option.none();
                 }

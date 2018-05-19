@@ -18,7 +18,7 @@ public class TableAliasProvider implements AliasProvider {
 
         this.alias = SQLBlock.of(aliasName);
 
-        // NOTE: Currently, just concaat alias and column name
+        // NOTE: Currently, just concat alias and column name
         // TODO: shorten column name
         this.columnNameAliasMap = columnNames.stream()
                 .map(name -> Pair.of(name, aliasName + "_" + name))

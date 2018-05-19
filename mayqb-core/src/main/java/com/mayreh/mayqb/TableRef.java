@@ -7,6 +7,8 @@ public interface TableRef<T> {
 
     List<String> columnNames();
 
+    SQLBlock toSQL();
+
     default List<SQLBlock> columns() {
         return columnNames().stream().map(SQLBlock::of).collect(Collectors.toList());
     }

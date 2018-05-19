@@ -1,13 +1,11 @@
 package com.mayreh.mayqb.util;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
- * Another implementation of Maybe
+ * Another implementation of java.util.Optional
+ * Unlike java.util.Optional, higher order functions (e.g. filter, map) take a function may cause SQLException
  */
 public final class Option<T> {
 
@@ -33,7 +31,7 @@ public final class Option<T> {
         return new Option<>(value);
     }
 
-    public static <T> Option<T> apply(T value) {
+    public static <T> Option<T> ofNullable(T value) {
         return value == null ? none() : some(value);
     }
 
@@ -49,6 +47,20 @@ public final class Option<T> {
         return nonEmpty();
     }
 
+    public T get() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("none.get");
+        }
+        return this.value;
+    }
+
+    public T getOrElse(T ifEmpty) {
+        if (isEmpty()) {
+            return ifEmpty;
+        }
+        return this.value;
+    }
+
     public Option<T> filter(ThrowablePredicate<? super T> f) throws SQLException {
         if (isEmpty()) {
             return this;
@@ -61,7 +73,7 @@ public final class Option<T> {
         if (isEmpty()) {
             return none();
         } else {
-            return Option.apply(f.apply(this.value));
+            return Option.ofNullable(f.apply(this.value));
         }
     }
 

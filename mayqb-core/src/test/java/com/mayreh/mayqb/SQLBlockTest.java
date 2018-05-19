@@ -18,7 +18,7 @@ public class SQLBlockTest {
 
     @Test
     public void placeholders() {
-        SQLBlock block = SQLBlock.of("${@} + ${@}", 1, 1);
+        SQLBlock block = SQLBlock.of("${@} + ${@}", IntParameter.of(1), IntParameter.of(1));
         assertThat(block).isEqualTo(new SQLBlock("? + ?", Arrays.asList(IntParameter.of(1), IntParameter.of(1))));
     }
 
@@ -30,7 +30,7 @@ public class SQLBlockTest {
 
     @Test
     public void mixed() {
-        SQLBlock block = SQLBlock.of("SELECT ${@} FROM foo WHERE id = ${@}", SQLBlock.of("name"), 1);
+        SQLBlock block = SQLBlock.of("SELECT ${@} FROM foo WHERE id = ${@}", SQLBlock.of("name"), IntParameter.of(1));
         assertThat(block).isEqualTo(new SQLBlock("SELECT name FROM foo WHERE id = ?", Collections.singletonList(IntParameter.of(1))));
     }
 }
