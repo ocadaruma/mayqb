@@ -1,6 +1,6 @@
 package com.mayreh.mayqb.querybuilder;
 
-import com.mayreh.mayqb.AliasedTableRef;
+import com.mayreh.mayqb.LocalTableRef;
 import com.mayreh.mayqb.SQLBlock;
 import com.mayreh.mayqb.SQLBuilder;
 import com.mayreh.mayqb.util.CollectionUtil;
@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SelectBuilders {
 
@@ -19,7 +18,7 @@ public class SelectBuilders {
 
     @RequiredArgsConstructor
     public static class TableSelectSQLBuilder implements SQLBuilder {
-        private final List<AliasedTableRef> tableRefs;
+        private final List<LocalTableRef> tableRefs;
         private final SQLBlock sql;
         private final SelectType selectType;
         private final List<SQLBlock> columns;
@@ -29,12 +28,9 @@ public class SelectBuilders {
             SQLBlock result = SQLBlock.of("SELECT");
             switch (selectType) {
                 case ALL:
-                    for (AliasedTableRef tableRef : tableRefs) {
-                        List<SQLBlock> aliasedColumns = tableRef.getTableRef().columnNames().stream()
-                                .map(tableRef.getAliasProvider()::qualifiedColumnWithAlias)
-                                .collect(Collectors.toList());
-
-                        result = result.append(SQLBlock.join(SQLBlock.of(","), aliasedColumns));
+                    for (LocalTableRef tableRef : tableRefs) {
+                        result = result.append(SQLBlock.join(SQLBlock.of(","),
+                                tableRef.aliasProvider().qualifiedAliasedColumns()));
                     }
                     break;
                 case SPECIFIED_COLUMNS:
@@ -51,20 +47,20 @@ public class SelectBuilders {
                     sql.append(block), selectType, columns);
         }
 
-        private TableSelectSQLBuilder append(AliasedTableRef other, SQLBlock block) {
+        private TableSelectSQLBuilder append(LocalTableRef other, SQLBlock block) {
             return new TableSelectSQLBuilder(CollectionUtil.append(tableRefs, other),
                     sql.append(block), selectType, columns);
         }
 
-        public TableSelectSQLBuilder leftJoin(AliasedTableRef other) {
+        public TableSelectSQLBuilder leftJoin(LocalTableRef other) {
             return append(other, SQLBlock.of("LEFT JOIN ${@}", other.toSQL()));
         }
 
-        public TableSelectSQLBuilder rightJoin(AliasedTableRef other) {
+        public TableSelectSQLBuilder rightJoin(LocalTableRef other) {
             return append(other, SQLBlock.of("RIGHT JOIN ${@}", other.toSQL()));
         }
 
-        public TableSelectSQLBuilder innerJoin(AliasedTableRef other) {
+        public TableSelectSQLBuilder innerJoin(LocalTableRef other) {
             return append(other, SQLBlock.of("INNER JOIN ${@}", other.toSQL()));
         }
 
@@ -103,7 +99,7 @@ public class SelectBuilders {
                     SQLBlock.join(SQLBlock.of(","), columns));
         }
 
-        public TableSelectSQLBuilder from(AliasedTableRef tableRef) {
+        public TableSelectSQLBuilder from(LocalTableRef tableRef) {
             return new TableSelectSQLBuilder(Collections.singletonList(tableRef),
                     SQLBlock.of("FROM ${@}", tableRef.toSQL()), SelectType.SPECIFIED_COLUMNS, columns);
         }

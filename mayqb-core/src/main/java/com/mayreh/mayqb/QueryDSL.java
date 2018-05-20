@@ -11,7 +11,7 @@ public class QueryDSL {
         return new ResultTransformer(builder.build());
     }
 
-    public static TableSelectSQLBuilder selectFrom(AliasedTableRef tableRef) {
+    public static TableSelectSQLBuilder selectFrom(LocalTableRef tableRef) {
         return new TableSelectSQLBuilder(Collections.singletonList(tableRef),
                 SQLBlock.of("FROM ${@}", tableRef.toSQL()), SelectType.ALL, Collections.emptyList());
     }

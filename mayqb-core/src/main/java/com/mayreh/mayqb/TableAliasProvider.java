@@ -2,31 +2,29 @@ package com.mayreh.mayqb;
 
 import com.mayreh.mayqb.util.Pair;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TableAliasProvider implements AliasProvider {
 
-    private final SQLBlock tableAlias;
+    private final Table table;
+
+    private final String localTableName;
 
     private final Map<String, String> columnNameAliasMap;
 
-    public TableAliasProvider(TableRef tableRef, String aliasName) {
-        List<String> columnNames = tableRef.columns().stream()
-                .map(SQLBlock::getValue).collect(Collectors.toList());
+    public TableAliasProvider(Table table, String localTableName) {
+        this.table = table;
 
-        this.tableAlias = SQLBlock.of(aliasName);
+        this.localTableName = localTableName;
 
         // NOTE: Currently, just concat tableAlias and columnAlias name
         // TODO: shorten columnAlias name
-        this.columnNameAliasMap = columnNames.stream()
-                .map(name -> Pair.of(name, aliasName + "_" + name))
+        this.columnNameAliasMap = table.columnNames().stream()
+                .map(name -> Pair.of(name, localTableName + "_" + name))
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-    }
-
-    public SQLBlock tableAlias() {
-        return this.tableAlias;
     }
 
     @Override
@@ -43,12 +41,25 @@ public class TableAliasProvider implements AliasProvider {
             throw new IllegalArgumentException("invalid columnAlias name : ");
         }
 
-        return SQLBlock.of("${@}.${@}", tableAlias, SQLBlock.of(columnName));
+        return SQLBlock.of("${@}.${@}",
+                new SQLBlock(localTableName, Collections.emptyList()),
+                new SQLBlock(columnName, Collections.emptyList()));
     }
 
-    public SQLBlock qualifiedColumnWithAlias(String columnName) {
+    @Override
+    public SQLBlock qualifiedAliasedColumn(String columnName) {
         return SQLBlock.of("${@} AS ${@}",
                 qualifiedColumn(columnName),
                 columnAlias(columnName));
+    }
+
+    @Override
+    public String localTableName() {
+        return this.localTableName;
+    }
+
+    @Override
+    public List<String> columnNames() {
+        return table.columnNames();
     }
 }

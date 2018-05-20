@@ -10,9 +10,9 @@ import static org.assertj.core.api.Assertions.*;
 
 public class QueryDSLTest {
 
-    public static class UserTable extends StandardTableRef {
+    public static class UserTable extends Table {
 
-        public final TableAliasProvider u = aliasProvider("u");
+        public final AliasProvider u = aliasProvider("u");
 
         @Override
         public String tableName() {
@@ -25,9 +25,9 @@ public class QueryDSLTest {
         }
     }
 
-    public static class PostTable extends StandardTableRef {
+    public static class PostTable extends Table {
 
-        public final TableAliasProvider p = aliasProvider("p");
+        public final AliasProvider p = aliasProvider("p");
 
         @Override
         public String tableName() {
@@ -53,14 +53,16 @@ public class QueryDSLTest {
                 .from(userTable.as(userTable.u))
                 .groupBy(userTable.u.qualifiedColumn("name")).build();
 
-        assertThat(result).isEqualTo(SQLBlock.of("SELECT name,COUNT(1) FROM user AS u GROUP BY u.name"));
+        assertThat(result).isEqualTo(SQLBlock.of("SELECT name,COUNT(1) FROM user u GROUP BY u.name"));
     }
 
     @Test
     public void buildSelectFrom() {
         UserTable userTable = new UserTable();
         SQLBlock result = selectFrom(userTable.as(userTable.u))
-                .orderBy(userTable.u.qualifiedColumn("id"), userTable.u.qualifiedColumn("name"))
+                .orderBy(
+                        userTable.u.qualifiedColumn("id"),
+                        userTable.u.qualifiedColumn("name"))
                 .limit(1)
                 .offset(55301)
                 .build();
