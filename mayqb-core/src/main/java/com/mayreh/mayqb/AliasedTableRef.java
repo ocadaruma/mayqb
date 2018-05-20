@@ -3,15 +3,15 @@ package com.mayreh.mayqb;
 import lombok.Value;
 
 @Value
-public class AliasedTableRef<T> {
+public class AliasedTableRef {
 
-    AliasProvider aliasProvider;
+    TableAliasProvider aliasProvider;
 
-    TableRef<T> tableRef;
+    TableRef tableRef;
 
     public SQLBlock toSQL() {
-        return SQLBlock.of("${@} AS ${@}",
+        return SQLBlock.of("${@} ${@}",
                 tableRef.toSQL(),
-                aliasProvider.alias());
+                aliasProvider.tableAlias());
     }
 }

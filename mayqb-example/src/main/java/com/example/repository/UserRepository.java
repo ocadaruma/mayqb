@@ -28,9 +28,9 @@ public class UserRepository implements TableRef<User> {
 
     public User from(WrappedResultSet rs) throws SQLException {
         return User.builder()
-                .id(rs.getLong(u.column("id").getValue()))
-                .name(rs.getString(u.column("name").getValue()))
-                .email(rs.getString(u.column("email").getValue()))
+                .id(rs.getLong(u.columnAlias("id").getValue()))
+                .name(rs.getString(u.columnAlias("name").getValue()))
+                .email(rs.getString(u.columnAlias("email").getValue()))
                 .updatedAt(null)
                 .createdAt(null)
                 .build();
@@ -38,7 +38,7 @@ public class UserRepository implements TableRef<User> {
 
     public List<UserWithPosts> findAll(DBContext ctx) {
         selectFrom(this.as(u))
-                .orderBy(u.column("id"))
+                .orderBy(u.columnAlias("id"))
                 .one(UserRepository::from)
                 .toMany(postRepository::optionalFrom)
                 .map(UserWithPosts::new)
@@ -50,8 +50,8 @@ public class UserRepository implements TableRef<User> {
         withSQL(
                 selectFrom(this.as(u))
                         .innerJoin(postRepository.as(postRepository.p))
-                        .where(u.column("name").eq(StringParameter.of(name)))
-                        .orderBy(u.column("name").asc())
+                        .where(u.columnAlias("name").eq(StringParameter.of(name)))
+                        .orderBy(u.columnAlias("name").asc())
         )
                 .one(UserRepository::from)
                 .toMany(postRepository::optionalFrom)
@@ -60,8 +60,8 @@ public class UserRepository implements TableRef<User> {
                 .executeSync(ctx);
 
         selectFrom(this.as(u))
-                .where(u.column("name").eq(StringParameter.of(name)))
-                .orderBy(u.column("name").asc())
+                .where(u.columnAlias("name").eq(StringParameter.of(name)))
+                .orderBy(u.columnAlias("name").asc())
                 .map()
                 .list()
                 .executeSync(ctx);

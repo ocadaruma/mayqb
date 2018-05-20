@@ -8,7 +8,7 @@ public class ExecutableSQL {
 
     public static class Single<T> {
         public Optional<T> executeSync(DBContext ctx) {
-
+            throw new NotImplementedException();
         }
     }
 

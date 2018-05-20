@@ -21,14 +21,14 @@ public class PostRepository implements TableRef<Post> {
 
     public Post from(WrappedResultSet rs) throws SQLException {
         return Post.builder()
-                .id(rs.getLong(p.column("id").getValue()))
-                .userId(rs.getLong(p.column("user_id").getValue()))
-                .body(rs.getString(p.column("body").getValue()))
+                .id(rs.getLong(p.columnAlias("id").getValue()))
+                .userId(rs.getLong(p.columnAlias("user_id").getValue()))
+                .body(rs.getString(p.columnAlias("body").getValue()))
                 .build();
     }
 
     public Optional<Post> optionalFrom(WrappedResultSet rs) throws SQLException {
-        return rs.getLongOpt(p.column("id").getValue())
+        return rs.getLongOpt(p.columnAlias("id").getValue())
                 .map(unused -> from(rs)).toOptional();
     }
 }

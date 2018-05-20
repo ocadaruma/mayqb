@@ -1,11 +1,9 @@
 package com.mayreh.mayqb;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,9 +11,10 @@ import java.util.List;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode
+@ToString
 public class SQLBlock {
 
-    private static final SQLBlock EMPTY = SQLBlock.of("");
+    public static final SQLBlock EMPTY = SQLBlock.of("");
 
     /**
      * Literal part of this block
@@ -87,5 +86,22 @@ public class SQLBlock {
         }
 
         return new SQLBlock(queryPart.toString(), expandedParams);
+    }
+
+    public static SQLBlock join(SQLBlock delimiter, SQLBlock... blocks) {
+        return join(delimiter, Arrays.asList(blocks));
+    }
+
+    public static SQLBlock join(SQLBlock delimiter, List<SQLBlock> blocks) {
+        SQLBlock result = EMPTY;
+
+        for (int i = 0; i < blocks.size(); i++) {
+            if (i > 0) {
+                result = SQLBlock.of("${@}${@}", result, delimiter);
+            }
+            result = SQLBlock.of("${@}${@}", result, blocks.get(i));
+        }
+
+        return result;
     }
 }

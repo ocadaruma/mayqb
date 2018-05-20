@@ -2,7 +2,9 @@ package com.mayreh.mayqb;
 
 public interface AliasProvider {
 
-    SQLBlock alias();
+    SQLBlock columnAlias(String columnName);
 
-    SQLBlock column(String columnName);
+    default SQLBlock columnAlias(SQLBlock columnName) {
+        return columnAlias(columnName.getValue());
+    }
 }

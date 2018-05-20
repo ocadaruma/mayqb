@@ -3,7 +3,7 @@ package com.mayreh.mayqb;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface TableRef<T> {
+public interface TableRef {
 
     List<String> columnNames();
 
@@ -13,11 +13,11 @@ public interface TableRef<T> {
         return columnNames().stream().map(SQLBlock::of).collect(Collectors.toList());
     }
 
-    default AliasedTableRef<T> as(AliasProvider aliasProvider) {
-        return new AliasedTableRef<>(aliasProvider, this);
+    default AliasedTableRef as(TableAliasProvider aliasProvider) {
+        return new AliasedTableRef(aliasProvider, this);
     }
 
-    default AliasProvider aliasProvider(String alias) {
+    default TableAliasProvider aliasProvider(String alias) {
         return new TableAliasProvider(this, alias);
     }
 }

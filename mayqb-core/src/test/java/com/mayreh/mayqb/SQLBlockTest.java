@@ -33,4 +33,16 @@ public class SQLBlockTest {
         SQLBlock block = SQLBlock.of("SELECT ${@} FROM foo WHERE id = ${@}", SQLBlock.of("name"), IntParameter.of(1));
         assertThat(block).isEqualTo(new SQLBlock("SELECT name FROM foo WHERE id = ?", Collections.singletonList(IntParameter.of(1))));
     }
+
+    @Test
+    public void join() {
+        assertThat(SQLBlock.join(SQLBlock.of(", "), SQLBlock.of("1")))
+                .isEqualTo(SQLBlock.of("1"));
+
+        assertThat(SQLBlock.join(SQLBlock.of(", "), SQLBlock.of("name"), SQLBlock.of("COUNT(*)")))
+                .isEqualTo(SQLBlock.of("name, COUNT(*)"));
+
+        assertThat(SQLBlock.join(SQLBlock.of(", ")))
+                .isEqualTo(SQLBlock.EMPTY);
+    }
 }
