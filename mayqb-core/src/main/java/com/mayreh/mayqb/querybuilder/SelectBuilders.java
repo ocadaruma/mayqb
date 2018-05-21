@@ -1,13 +1,12 @@
 package com.mayreh.mayqb.querybuilder;
 
-import com.mayreh.mayqb.LocalTableRef;
-import com.mayreh.mayqb.SQLBlock;
-import com.mayreh.mayqb.SQLBuilder;
+import com.mayreh.mayqb.*;
 import com.mayreh.mayqb.util.CollectionUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelectBuilders {
 
@@ -40,6 +39,13 @@ public class SelectBuilders {
             result = result.append(sql);
 
             return result;
+        }
+
+        public LocalTableRef as() {
+            SubQuery subQueryRef = new SubQuery(this.build(), columns);
+            AliasProvider aliasProvider = new AliasProvider();
+
+            return subQueryRef.as(aliasProvider);
         }
 
         private TableSelectSQLBuilder append(SQLBlock block) {
@@ -102,6 +108,16 @@ public class SelectBuilders {
         public TableSelectSQLBuilder from(LocalTableRef tableRef) {
             return new TableSelectSQLBuilder(Collections.singletonList(tableRef),
                     SQLBlock.of("FROM ${@}", tableRef.toSQL()), SelectType.SPECIFIED_COLUMNS, columns);
+        }
+
+        public LocalTableRef as(SubQueryAliasProvider sub) {
+            SubQuery subQueryRef = new SubQuery(this.build(), columns);
+
+            AliasProvider aliasProvider = new AliasProvider(
+                    columns.stream().map(SQLBlock::getValue).collect(Collectors.toList()),
+                    sub.localTableName());
+
+            return subQueryRef.as(aliasProvider);
         }
     }
 }

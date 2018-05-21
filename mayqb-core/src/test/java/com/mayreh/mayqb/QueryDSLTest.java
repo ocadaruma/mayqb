@@ -70,4 +70,20 @@ public class QueryDSLTest {
         assertThat(result).isEqualTo(SQLBlock.of(
                 "SELECT u.id AS u_id,u.name AS u_name,u.created_at AS u_created_at FROM user u ORDER BY u.id,u.name LIMIT 1 OFFSET 55301"));
     }
+
+    @Test
+    public void buildSubQuery() {
+        UserTable userTable = new UserTable();
+        SQLBlock result =
+                selectFrom(userTable.as(userTable.u))
+                        .orderBy(
+                                userTable.u.qualifiedColumn("id"),
+                                userTable.u.qualifiedColumn("name"))
+                        .limit(1)
+                        .offset(55301)
+                        .build();
+
+        assertThat(result).isEqualTo(SQLBlock.of(
+                "SELECT u.id AS u_id,u.name AS u_name,u.created_at AS u_created_at FROM user u ORDER BY u.id,u.name LIMIT 1 OFFSET 55301"));
+    }
 }

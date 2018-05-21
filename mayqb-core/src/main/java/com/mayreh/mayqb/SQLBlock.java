@@ -36,19 +36,11 @@ public class SQLBlock {
     }
 
     public SQLBlock asc() {
-        return SQLBlock.of("${@} asc", this);
+        return this.append(SQLBlock.of("ASC"));
     }
 
     public SQLBlock desc() {
-        return SQLBlock.of("${@} desc", this);
-    }
-
-    public SQLBlock limit(int n) {
-        return SQLBlock.of("${@} limit ${@}", this, SQLBlock.of(String.valueOf(n)));
-    }
-
-    public SQLBlock offset(int n) {
-        return SQLBlock.of("${@} offset ${@}", this, SQLBlock.of(String.valueOf(n)));
+        return this.append(SQLBlock.of("DESC"));
     }
 
     /**

@@ -2,6 +2,7 @@ package com.example.repository;
 
 import com.example.model.Post;
 import com.mayreh.mayqb.AliasProvider;
+import com.mayreh.mayqb.Table;
 import com.mayreh.mayqb.TableRef;
 import com.mayreh.mayqb.WrappedResultSet;
 
@@ -10,9 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class PostRepository implements TableRef<Post> {
+public class PostRepository extends Table {
 
     public final AliasProvider p = aliasProvider("p");
+
+    @Override
+    public String tableName() {
+        return "post";
+    }
 
     @Override
     public List<String> columnNames() {

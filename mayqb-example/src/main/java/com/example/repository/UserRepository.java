@@ -15,11 +15,16 @@ import static com.mayreh.mayqb.QueryDSL.selectFrom;
 import static com.mayreh.mayqb.QueryDSL.withSQL;
 
 @RequiredArgsConstructor
-public class UserRepository implements TableRef<User> {
+public class UserRepository extends Table {
 
     public final AliasProvider u = aliasProvider("u");
 
     private final PostRepository postRepository;
+
+    @Override
+    public String tableName() {
+        return "user";
+    }
 
     @Override
     public List<String> columnNames() {
@@ -47,13 +52,18 @@ public class UserRepository implements TableRef<User> {
     }
 
     public List<User> findByName(String name, int limit, DBContext ctx) {
+        SubQuery sub = SubQuery.named("sub");
         withSQL(
-                selectFrom(this.as(u))
+                selectFrom(
+                        selectFrom(this.as(u))
+                                .innerJoin(postRepository.as(postRepository.p))
+                                .orderBy(u.qualifiedColumn("name").asc())
+                                .as(sub)
+                )
                         .innerJoin(postRepository.as(postRepository.p))
-                        .where(u.columnAlias("name").eq(StringParameter.of(name)))
-                        .orderBy(u.columnAlias("name").asc())
+                        .orderBy(u.inSubQuery(sub).qualifiedColumn("name").asc())
         )
-                .one(UserRepository::from)
+                .one(this::from)
                 .toMany(postRepository::optionalFrom)
                 .map(UserWithPosts::new)
                 .list()
